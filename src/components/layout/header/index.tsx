@@ -4,8 +4,16 @@ import Link from "next/link";
 
 import Menu from "./menu";
 import Tool from "./tool";
+import { usePathname } from "next/navigation";
+import { WHITE_LIST } from "~/utils/constants";
 
 function Header() {
+  const pathName = usePathname();
+
+  if (WHITE_LIST.some((item) => pathName.startsWith(item))) {
+    return null;
+  }
+
   return (
     <div className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 dark:border-border fixed top-0 z-50 flex h-16 w-full items-center border-b px-4 shadow backdrop-blur md:px-6">
       <Link className="flex-shrink-0" href="/">

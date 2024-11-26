@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import Link from "next/link";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -13,6 +14,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   AuthCredentialsValidator,
   type TAuthCredentialsValidator,
@@ -52,52 +54,59 @@ function SignInPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md p-4 shadow-md">
-        <h2 className="text-center text-2xl font-bold leading-tight text-black">
-          登录
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">没有账号？注册</p>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="mt-5 w-full space-y-5 pb-2"
-          >
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>邮箱</FormLabel>
-                  <FormControl>
-                    <Input placeholder="请输入邮箱" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>密码</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="请输入密码"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button className="w-full" type="submit">
-              Submit
-            </Button>
-          </form>
-        </Form>
-      </div>
+      <Card className="mx-auto w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl">登&nbsp;录</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="mt-5 w-full space-y-5 pb-2"
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>邮箱</FormLabel>
+                    <FormControl>
+                      <Input placeholder="请输入邮箱" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>密码</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="请输入密码"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button className="w-full" type="submit">
+                登录
+              </Button>
+            </form>
+          </Form>
+          <div className="mt-4 text-center text-sm">
+            没有账号？
+            <Link href="#" className="underline">
+              注册
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
