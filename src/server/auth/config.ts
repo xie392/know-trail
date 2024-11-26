@@ -2,7 +2,6 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 
 import Credentials from "next-auth/providers/credentials";
-import { compare } from "bcrypt";
 
 import { createRefreshToken, db } from "~/server/db";
 import { SecurityService } from "~/utils/security";
@@ -58,11 +57,6 @@ export const authConfig = {
     // 确保 JWT 包含必要的用户信息
     jwt: async ({ token, user }) => {
       if (user) {
-        // token.id = user.id;
-        // token.email = user.email;
-        // const refreshToken = await createRefreshToken(user.id!);
-        // token.refreshToken = refreshToken.token;
-
         token.id = user.id;
         token.email = user.email;
 

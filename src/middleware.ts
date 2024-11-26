@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "./server/auth";
-import { db } from "./server/db";
+// import { db } from "./server/db";
+
+const whiteList = ["/sign-up", "/sign-in"];
 
 export async function middleware(request: NextRequest) {
   const session = await auth();
+  const pathname = request.nextUrl.pathname;
+
+  // 处理认证路由
+  if (session && whiteList.includes(pathname)) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
   // 黑名单设备
   //   if (session?.token) {

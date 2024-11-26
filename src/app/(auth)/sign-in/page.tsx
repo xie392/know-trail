@@ -1,33 +1,51 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+import { Button } from "~/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormLabel,
+  FormItem,
+  FormMessage,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import {
+  AuthCredentialsValidator,
+  type TAuthCredentialsValidator,
+} from "~/lib/validators/auth-credentials-validator";
+
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Toast } from "~/utils/toast";
 
 function SignInPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: "123@qq.com",
-    password: "123456",
+
+  const form = useForm<TAuthCredentialsValidator>({
+    resolver: zodResolver(AuthCredentialsValidator),
+    defaultValues: {
+      email: "123@qq.com",
+      password: "123456",
+    },
   });
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: TAuthCredentialsValidator) => {
     const signInResult = await signIn("credentials", {
-      email: formData.email,
-      password: formData.password,
+      email: data.email,
+      password: data.password,
       redirect: false,
     });
 
-    console.log("signInResult", signInResult);
     if (signInResult?.error) {
-      console.log("signInResult.error", signInResult.error);
+      Toast.error("邮箱或密码错误");
       return;
     }
 
     if (signInResult?.ok) {
-      // router.refresh();
-      await new Promise((resolve) => setTimeout(resolve, 500));
       router.push("/");
     }
   };
@@ -39,26 +57,46 @@ function SignInPage() {
           登录
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">没有账号？注册</p>
-        <form onSubmit={onSubmit} className="mt-5 w-full space-y-5 pb-2">
-          <input
-            placeholder="请输入邮箱"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-          />
-          <input
-            placeholder="请输入密码"
-            type="password"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-          />
-          <button className="w-full" type="submit">
-            Submit
-          </button>
-        </form>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="mt-5 w-full space-y-5 pb-2"
+          >
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>邮箱</FormLabel>
+                  <FormControl>
+                    <Input placeholder="请输入邮箱" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>密码</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="请输入密码"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button className="w-full" type="submit">
+              Submit
+            </Button>
+          </form>
+        </Form>
       </div>
     </div>
   );
