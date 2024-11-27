@@ -17,8 +17,6 @@ import {
 
 import { NavFavorites } from "~/components/post/nav-favorites";
 import { NavMain } from "~/components/post/nav-main";
-import { NavSecondary } from "~/components/post/nav-secondary";
-import { NavWorkspaces } from "~/components/post/nav-workspaces";
 import { TeamSwitcher } from "~/components/post/team-switcher";
 import {
   Sidebar,
@@ -49,23 +47,23 @@ const data = {
   ],
   navMain: [
     {
-      title: "Search",
+      title: "首页",
       url: "#",
       icon: Search,
     },
     {
-      title: "Ask AI",
+      title: "知识库",
       url: "#",
       icon: Sparkles,
     },
     {
-      title: "Home",
+      title: "关于",
       url: "#",
       icon: Home,
       isActive: true,
     },
     {
-      title: "Inbox",
+      title: "知识广场",
       url: "#",
       icon: Inbox,
       badge: "10",
@@ -99,56 +97,16 @@ const data = {
     },
   ],
   favorites: [
-    {
-      name: "Project Management & Task Tracking",
-      url: "#",
-      emoji: "📊",
-    },
-    {
-      name: "Family Recipe Collection & Meal Planning",
-      url: "#",
-      emoji: "🍳",
-    },
-    {
-      name: "Fitness Tracker & Workout Routines",
-      url: "#",
-      emoji: "💪",
-    },
-    {
-      name: "Book Notes & Reading List",
-      url: "#",
-      emoji: "📚",
-    },
-    {
-      name: "Sustainable Gardening Tips & Plant Care",
-      url: "#",
-      emoji: "🌱",
-    },
-    {
-      name: "Language Learning Progress & Resources",
-      url: "#",
-      emoji: "🗣️",
-    },
-    {
-      name: "Home Renovation Ideas & Budget Tracker",
-      url: "#",
-      emoji: "🏠",
-    },
-    {
-      name: "Personal Finance & Investment Portfolio",
-      url: "#",
-      emoji: "💰",
-    },
-    {
-      name: "Movie & TV Show Watchlist with Reviews",
-      url: "#",
-      emoji: "🎬",
-    },
-    {
-      name: "Daily Habit Tracker & Goal Setting",
-      url: "#",
-      emoji: "✅",
-    },
+    [
+      "第一章、介绍",
+      [
+        "Introduction",
+        ["hello", ["route.ts"]],
+        "page.tsx",
+        "layout.tsx",
+        ["blog", ["page.tsx"]],
+      ],
+    ],
   ],
   workspaces: [
     {
@@ -271,8 +229,6 @@ export function SidebarLeft({
       <ScrollArea>
         <SidebarContent className="max-w-[256px]">
           <NavFavorites favorites={data.favorites} />
-          <NavWorkspaces workspaces={data.workspaces} />
-          <NavSecondary items={data.navSecondary} className="mt-auto" />
         </SidebarContent>
       </ScrollArea>
       <SidebarRail />

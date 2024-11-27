@@ -9,8 +9,12 @@ export async function middleware(request: NextRequest) {
   const session = await auth();
   const pathname = request.nextUrl.pathname;
 
-  // 处理认证路由
+  if (!session && pathname.startsWith("/workspace")) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
   if (session && whiteList.includes(pathname)) {
+    // 处理认证路由
     return NextResponse.redirect(new URL("/", request.url));
   }
 

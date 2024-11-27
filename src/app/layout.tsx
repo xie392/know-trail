@@ -6,7 +6,6 @@ import { Toaster } from "react-hot-toast";
 
 import { TRPCReactProvider } from "~/trpc/react";
 
-import Header from "~/components/layout/header";
 import ThemeProvider from "~/components/common/theme-provider";
 import { ScrollArea } from "~/components/ui/scroll-area";
 
@@ -24,10 +23,7 @@ export default function RootLayout({
       <body>
         <ScrollArea className="h-screen">
           <TRPCReactProvider>
-            <ThemeProvider>
-              <Header />
-              {children}
-            </ThemeProvider>
+            <ThemeProvider>{children}</ThemeProvider>
           </TRPCReactProvider>
           <Toaster />
         </ScrollArea>

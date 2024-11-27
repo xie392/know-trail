@@ -24,7 +24,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Toast } from "~/utils/toast";
 
-function SignInPage() {
+export default function SignInPage() {
   const router = useRouter();
 
   const form = useForm<TAuthCredentialsValidator>({
@@ -110,5 +110,3 @@ function SignInPage() {
     </div>
   );
 }
-
-export default SignInPage;

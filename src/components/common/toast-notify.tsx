@@ -6,7 +6,7 @@ interface ToastNotifyProps {
   message: string;
 }
 
-function ToastNotify({ t, message }: ToastNotifyProps) {
+export default function ToastNotify({ t, message }: ToastNotifyProps) {
   return (
     <div
       className={`${
@@ -39,5 +39,3 @@ function ToastNotify({ t, message }: ToastNotifyProps) {
     </div>
   );
 }
-
-export default ToastNotify;

@@ -4,7 +4,11 @@ import { useEffect } from "react";
 import { useConfigStore } from "~/stores/config";
 import { ThemeColor } from "~/utils/enum";
 
-function ThemeProvider({ children }: { children: React.ReactNode }) {
+export default function ThemeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const theme = useConfigStore((state) => state.theme);
 
   useEffect(() => {
@@ -20,5 +24,3 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return children;
 }
-
-export default ThemeProvider;

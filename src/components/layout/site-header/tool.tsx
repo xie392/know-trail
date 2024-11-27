@@ -8,7 +8,7 @@ import { Button } from "~/components/ui/button";
 import { useConfigStore } from "~/stores/config";
 import { ThemeColor } from "~/utils/enum";
 
-function Tool() {
+export default function Tool() {
   const theme = useConfigStore((state) => state.theme);
   const toggleTheme = useConfigStore((state) => state.toggleTheme);
 
@@ -20,9 +20,9 @@ function Tool() {
           variant="outline"
         >
           <span className="inline-flex">搜索文档...</span>
-          <kbd className="bg-muted pointer-events-none -mr-2 flex select-none items-center space-x-1 rounded border px-1.5 font-mono text-[14px] font-medium">
+          <kbd className="bg-muted pointer-events-none -mr-2 flex select-none items-center space-x-1 rounded border px-1.5 align-middle font-mono text-[14px] font-medium">
             <span className="text-xs">⌘</span>
-            <span>K</span>
+            <span className="-mt-[2px]">K</span>
           </kbd>
         </Button>
       </div>
@@ -48,5 +48,3 @@ function Tool() {
     </div>
   );
 }
-
-export default Tool;

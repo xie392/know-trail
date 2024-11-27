@@ -1,5 +1,5 @@
 import { SidebarLeft } from "~/components/post/sidebar-left";
-// import { SidebarRight } from "~/components/post/sidebar-right";
+import { SidebarRight } from "~/components/post/sidebar-right";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,7 +13,7 @@ import {
   SidebarTrigger,
 } from "~/components/ui/sidebar";
 
-function PostPage() {
+export default function PostPage() {
   return (
     <SidebarProvider>
       <SidebarLeft />
@@ -38,9 +38,7 @@ function PostPage() {
           <div className="bg-muted/50 mx-auto h-[100vh] w-full max-w-3xl rounded-xl" />
         </div>
       </SidebarInset>
-      {/* <SidebarRight /> */}
+      <SidebarRight />
     </SidebarProvider>
   );
 }
-
-export default PostPage;

@@ -1,45 +1,38 @@
-"use client"
+"use client";
 
-import {
-  ArrowUpRight,
-  Link,
-  MoreHorizontal,
-  StarOff,
-  Trash2,
-} from "lucide-react"
+import { ChevronRight, Folder, File, BookOpenText } from "lucide-react";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
 import {
   SidebarGroup,
+  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
-} from "~/components/ui/sidebar"
+  SidebarMenuSub,
+} from "~/components/ui/sidebar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "~/components/ui/collapsible";
 
 export function NavFavorites({
   favorites,
 }: {
-  favorites: {
-    name: string
-    url: string
-    emoji: string
-  }[]
+  favorites: (string | (string | (string | (string | string[])[])[])[])[];
 }) {
-  const { isMobile } = useSidebar()
-
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Favorites</SidebarGroupLabel>
-      <SidebarMenu>
+      <SidebarGroupLabel>知识库列表</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {favorites.map((item, index) => (
+            <Tree key={index} item={item} />
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+      {/* <SidebarMenu>
         {favorites.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
@@ -88,7 +81,49 @@ export function NavFavorites({
             <span>More</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
-      </SidebarMenu>
+      </SidebarMenu> */}
     </SidebarGroup>
-  )
+  );
+}
+
+function Tree({ item }: { item: string | any[] }) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const [name, ...items] = Array.isArray(item) ? item : [item];
+
+  if (!items.length) {
+    return (
+      <SidebarMenuButton
+        isActive={name === "button.tsx"}
+        className="data-[active=true]:bg-transparent"
+      >
+        <File />
+        {/* <BookOpenText /> */}
+        {name}
+      </SidebarMenuButton>
+    );
+  }
+
+  return (
+    <SidebarMenuItem>
+      <Collapsible
+        className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
+        defaultOpen={name === "components" || name === "ui"}
+      >
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton>
+            <ChevronRight className="transition-transform" />
+            <Folder />
+            {name}
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            {items.map((subItem: string | any[], index: number) => (
+              <Tree key={index} item={subItem} />
+            ))}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </Collapsible>
+    </SidebarMenuItem>
+  );
 }
