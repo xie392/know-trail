@@ -1,9 +1,10 @@
-import { ThemeColor } from "~/utils/enum";
+import { Locale, ThemeColor } from "~/utils/enum";
 import { createPersistStore } from "~/utils/store";
 
 export const useConfigStore = createPersistStore(
   {
     theme: ThemeColor.Light,
+    locale: Locale.ZhCN,
   },
   (set, get) => ({
     toggleTheme: () => {

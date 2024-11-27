@@ -42,72 +42,12 @@ model Session {
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-    id            String         @id @default(cuid())
-    name          String?
-    email         String?        @unique
-    emailVerified DateTime?
-    image         String?
-    password      String?
-    role          String         @default("USER")
-    createdAt     DateTime       @default(now())
-    updatedAt     DateTime       @updatedAt
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
-    comments      Comment[]
-    refreshTokens RefreshToken[]
-    deviceInfos   DeviceInfo[]
-    loginAttempt  LoginAttempt[]
-}
-
 model VerificationToken {
     identifier String
     token      String   @unique
     expires    DateTime
 
     @@unique([identifier, token])
-}
-
-model Post {
-    id        String    @id @default(cuid())
-    title     String
-    content   String
-    published Boolean   @default(false)
-    authorId  String
-    author    User      @relation(fields: [authorId], references: [id])
-    tags      PostTag[] // 多对多关系
-    comments  Comment[] // 文章的评论
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-}
-
-model Comment {
-    id        String   @id @default(cuid())
-    content   String
-    authorId  String
-    author    User     @relation(fields: [authorId], references: [id])
-    postId    String
-    post      Post     @relation(fields: [postId], references: [id])
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
-model Tag {
-    id        String    @id @default(cuid())
-    name      String    @unique // 标签名称
-    posts     PostTag[] // 多对多关系
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-}
-
-model PostTag {
-    id        String   @id @default(cuid())
-    postId    String
-    tagId     String
-    post      Post     @relation(fields: [postId], references: [id])
-    tag       Tag      @relation(fields: [tagId], references: [id])
-    createdAt DateTime @default(now())
 }
 
 model RefreshToken {
@@ -152,4 +92,112 @@ model BlockedToken {
     reason    String
     expiresAt DateTime
     createdAt DateTime @default(now())
+}
+
+// other
+model User {
+    id            String         @id @default(cuid())
+    name          String?
+    email         String?        @unique
+    emailVerified DateTime?
+    image         String?
+    password      String?
+    role          String         @default("USER")
+    bio           String? // 用户简介
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    accounts      Account[]
+    sessions      Session[]
+    comments      Comment[]
+    refreshTokens RefreshToken[]
+    deviceInfos   DeviceInfo[]
+    loginAttempt  LoginAttempt[]
+    teams         TeamMember[]
+    documents     Document[]
+}
+
+model Document {
+    id         String   @id @default(cuid())
+    title      String
+    content    String   @default("")
+    visibility String   @default("PUBLIC") // 文档可见性 (PUBLIC, PRIVATE, TEAM)
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    // 关系
+    authorId String
+    author   User          @relation(fields: [authorId], references: [id])
+    teamId   String?
+    team     Team?         @relation(fields: [teamId], references: [id])
+    tags     DocumentTag[]
+    comments Comment[]
+
+    // 自引用字段
+    parentId String? // 父文档的 ID
+    parent   Document?  @relation("ParentChild", fields: [parentId], references: [id])
+    children Document[] @relation("ParentChild")
+
+    // 排序字段 (用于前端自定义排序)
+    order Int @default(0)
+}
+
+// 团队表
+model Team {
+    id        String   @id @default(cuid())
+    name      String
+    logo      String? // 团队图标
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // 关系
+    members   TeamMember[]
+    documents Document[]
+}
+
+// 团队成员表 (中间表，关联用户和团队)
+model TeamMember {
+    id        String   @id @default(cuid())
+    userId    String
+    teamId    String
+    role      String   @default("MEMBER") // 成员角色 (OWNER, ADMIN, MEMBER)
+    createdAt DateTime @default(now())
+
+    // 关系
+    user User @relation(fields: [userId], references: [id])
+    team Team @relation(fields: [teamId], references: [id])
+}
+
+// 文档标签表 (中间表)
+model DocumentTag {
+    id         String @id @default(cuid())
+    documentId String
+    tagId      String
+
+    // 关系
+    document Document @relation(fields: [documentId], references: [id])
+    tag      Tag      @relation(fields: [tagId], references: [id])
+}
+
+// 标签表
+model Tag {
+    id        String   @id @default(cuid())
+    name      String   @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // 关系
+    documents DocumentTag[]
+}
+
+// 评论表
+model Comment {
+    id         String   @id @default(cuid())
+    content    String
+    createdAt  DateTime @default(now())
+    authorId   String
+    documentId String
+
+    // 关系
+    author   User     @relation(fields: [authorId], references: [id])
+    document Document @relation(fields: [documentId], references: [id])
 }

@@ -1,8 +1,8 @@
 export function SiteFooter() {
   return (
-    <footer className="bg-white py-8 text-zinc-900">
+    <footer className="py-8 text-zinc-900 dark:text-white">
       <div className="mx-auto flex max-w-screen-xl flex-col items-center gap-4 px-4">
-        <div>
+        {/* <div>
           <div className="flex select-none items-center">
             <div className="mr-2"></div>
             <div className="__className_0de8f1 text-xl">Tailsc</div>
@@ -38,7 +38,7 @@ export function SiteFooter() {
               Contact
             </a>
           </li>
-        </ul>
+        </ul> */}
         <div className="text-center text-sm text-zinc-500">
           © 2024 Tailsc. All Rights Reserved.
         </div>

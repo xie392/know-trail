@@ -1,5 +1,5 @@
 {
-  "name": "blog",
+  "name": "know-trail",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -49,6 +49,7 @@
     "lucide-react": "^0.461.0",
     "next": "^15.0.1",
     "next-auth": "5.0.0-beta.25",
+    "next-intl": "^3.25.3",
     "react": "^18.3.1",
     "react-day-picker": "8.10.1",
     "react-dom": "^18.3.1",

@@ -12,12 +12,12 @@ import { usePathname } from "next/navigation";
 
 const menus = [
   {
-    name: "知识库",
-    link: "/notes",
+    name: "知识广场",
+    link: "/playground",
   },
   {
-    name: "资源分享",
-    link: "/resources",
+    name: "知识库",
+    link: "/notes",
   },
   {
     name: "关于我",
@@ -29,14 +29,14 @@ export default function Menu() {
   const pathnmae = usePathname();
 
   return (
-    <NavigationMenu className="flex-1 flex-shrink-0">
+    <NavigationMenu className="hidden flex-1 flex-shrink-0 md:block">
       <NavigationMenuList>
         {menus.map((menu) => {
           return (
             <NavigationMenuItem key={menu.link}>
               <Link href={menu.link} legacyBehavior passHref>
                 <NavigationMenuLink
-                  className={cn(navigationMenuTriggerStyle(), {
+                  className={cn(navigationMenuTriggerStyle({}), {
                     "text-primary font-semibold": pathnmae.startsWith(
                       menu.link,
                     ),

@@ -39,5 +39,13 @@ const config = {
     "@typescript-eslint/no-unsafe-argument": "off",
     "@typescript-eslint/ban-ts-comment": "off",
   },
+  // overrides: [
+  //   {
+  //     files: ["next.config.js"],
+  //     rules: {
+  //       "@typescript-eslint/no-require-imports": "off",
+  //     },
+  //   },
+  // ],
 };
 module.exports = config;

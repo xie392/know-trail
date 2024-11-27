@@ -1,5 +1,4 @@
 import { SidebarLeft } from "~/components/document/sidebar-left";
-import { SidebarRight } from "~/components/document/sidebar-right";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,7 +12,11 @@ import {
   SidebarTrigger,
 } from "~/components/ui/sidebar";
 
-export default function PostPage() {
+interface WorkSpaceLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function WorkSpaceLayout({ children }: WorkSpaceLayoutProps) {
   return (
     <SidebarProvider>
       <SidebarLeft />
@@ -33,12 +36,8 @@ export default function PostPage() {
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <div className="bg-muted/50 mx-auto h-24 w-full max-w-3xl rounded-xl" />
-          <div className="bg-muted/50 mx-auto h-[100vh] w-full max-w-3xl rounded-xl" />
-        </div>
+        <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
       </SidebarInset>
-      <SidebarRight />
     </SidebarProvider>
   );
 }

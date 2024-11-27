@@ -230,7 +230,7 @@ const Sidebar = React.forwardRef<
         data-variant={variant}
         data-side={side}
       >
-        {/* This is what handles the sidebar gap on desktop */}
+        {/* 这就是处理桌面侧边栏间隙的方法*/}
         <div
           className={cn(
             "relative h-svh w-[--sidebar-width] bg-transparent transition-[width] duration-200 ease-linear",

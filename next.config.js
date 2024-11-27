@@ -3,24 +3,17 @@
  * for Docker builds.
  */
 import "./src/env.js";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin();
 
 /** @type {import("next").NextConfig} */
 const config = {
-  // webpack: (config, { isServer }) => {
-  //   if (!isServer) {
-  //     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  //     config.resolve.fallback = {
-  //       ...config.resolve.fallback,
-  //       bcrypt: false,
-  //     };
-  //   }
-  //   return config;
+  // experimental: {
+  //   turbo: {
+  //     // ...
+  //   },
   // },
-  experimental: {
-    turbo: {
-      // ...
-    },
-  },
 };
 
-export default config;
+export default withNextIntl(config);

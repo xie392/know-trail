@@ -3,6 +3,8 @@ import "~/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { Toaster } from "react-hot-toast";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 
 import { TRPCReactProvider } from "~/trpc/react";
 
@@ -15,18 +17,23 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en" className={GeistSans.variable}>
+    <html lang={locale} className={GeistSans.variable}>
       <body>
-        <ScrollArea className="h-screen">
-          <TRPCReactProvider>
-            <ThemeProvider>{children}</ThemeProvider>
-          </TRPCReactProvider>
-          <Toaster />
-        </ScrollArea>
+        <NextIntlClientProvider messages={messages}>
+          <ScrollArea className="h-screen">
+            <TRPCReactProvider>
+              <ThemeProvider>{children}</ThemeProvider>
+            </TRPCReactProvider>
+            <Toaster />
+          </ScrollArea>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
