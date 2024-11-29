@@ -1,0 +1,36 @@
+"use client";
+
+export { StarterKit } from "@tiptap/starter-kit";
+export { Highlight } from "@tiptap/extension-highlight";
+export { CharacterCount } from "@tiptap/extension-character-count";
+export { Underline } from "@tiptap/extension-underline";
+export { Placeholder } from "@tiptap/extension-placeholder";
+export { TextAlign } from "@tiptap/extension-text-align";
+export { TextStyle } from "@tiptap/extension-text-style";
+export { FontFamily } from "@tiptap/extension-font-family";
+export { Typography } from "@tiptap/extension-typography";
+export { Color } from "@tiptap/extension-color";
+export { FocusClasses as Focus } from "@tiptap/extension-focus";
+export { Dropcursor } from "@tiptap/extension-dropcursor";
+export { CollaborationCursor } from "@tiptap/extension-collaboration-cursor";
+export { Subscript } from "@tiptap/extension-subscript";
+export { Superscript } from "@tiptap/extension-superscript";
+export { Paragraph } from "@tiptap/extension-paragraph";
+export { BulletList } from "@tiptap/extension-bullet-list";
+export { OrderedList } from "@tiptap/extension-ordered-list";
+export { Collaboration } from "@tiptap/extension-collaboration";
+export { TaskItem } from "@tiptap/extension-task-item";
+export { TaskList } from "@tiptap/extension-task-list";
+
+// coustom extensions
+export { Horizontal } from "~/tiptap/extensions/horizontal";
+export { Heading } from "~/tiptap/extensions/heading";
+export { CodeBlock } from "~/tiptap/extensions/code-block";
+export { FontSize } from "~/tiptap/extensions/font-size";
+export { Figure } from "~/tiptap/extensions/figure";
+export { Quote } from "~/tiptap/extensions/quote";
+export { QuoteCaption } from "~/tiptap/extensions/quote-caption";
+export { Link } from "~/tiptap/extensions/link";
+export { ImageUpload } from "~/tiptap/extensions/image-upload";
+export { ImageBlock } from "~/tiptap/extensions/image-block";
+export { Document } from "~/tiptap/extensions/document";

@@ -14,8 +14,8 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { NavMain } from "~/components/document/nav-main";
-import { TeamSwitcher } from "~/components/document/team-switcher";
+import { NavMain } from "~/components/post/nav-main";
+import { TeamSwitcher } from "~/components/post/team-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -23,7 +23,7 @@ import {
   SidebarRail,
 } from "~/components/ui/sidebar";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { NavTree } from "~/components/document/nav-tree";
+import { NavTree } from "~/components/post/nav-tree";
 
 // This is sample data.
 const data = {
