@@ -3,7 +3,8 @@ import { type DefaultSession, type NextAuthConfig } from "next-auth";
 
 import Credentials from "next-auth/providers/credentials";
 
-import { createRefreshToken, db } from "~/server/db";
+import { createRefreshToken, db, rotateRefreshToken } from "~/server/db";
+import { TOKEN_NAME } from "~/utils/constants";
 import { SecurityService } from "~/utils/security";
 
 declare module "next-auth" {
@@ -56,6 +57,8 @@ export const authConfig = {
   callbacks: {
     // 确保 JWT 包含必要的用户信息
     jwt: async ({ token, user }) => {
+      console.log("jwt callback", token, user);
+
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -99,7 +102,25 @@ export const authConfig = {
         // 创建 refresh token
         const refreshToken = await createRefreshToken(user.id!);
         token.refreshToken = refreshToken.token;
+
+        // token.exp = Math.floor(Date.now() / 1000) + 24 * 60 * 60;
       }
+      // console.log("jwt callback token exp", token.exp);
+      // if (Date.now() / 1000 > token.exp!) {
+      //   try {
+      //     console.log("token?.refreshToken ", token?.refreshToken);
+
+      //     const newToken = await rotateRefreshToken(
+      //       token?.refreshToken as string,
+      //     );
+      //     token.refreshToken = newToken.token;
+      //     token.exp = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // 更新过期时间
+      //   } catch (error) {
+      //     console.error("刷新 token 失败:", error);
+      //     throw new Error("请重新登录");
+      //   }
+      // }
+
       return token;
     },
     // 从 JWT 中提取信息到 session
@@ -112,17 +133,26 @@ export const authConfig = {
       }
       return session;
     },
+    authorized: async ({ request, auth }) => {
+      console.log("authorized callback", request, auth);
+
+      if (!auth?.user) {
+        return false;
+      }
+      return true;
+    },
   },
   pages: {
     signIn: "/sign-in",
+    signOut: "/sign-out",
   },
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60,
+    maxAge: 60,
   },
   cookies: {
     sessionToken: {
-      name: "next-auth.session-token",
+      name: TOKEN_NAME,
       options: {
         httpOnly: true,
         sameSite: "lax",

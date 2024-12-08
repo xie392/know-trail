@@ -8,6 +8,7 @@ import { auth } from "~/server/auth";
 
 export async function Hero() {
   const seesion = await auth();
+  console.log("seesion", seesion);
 
   return (
     <section className="py-24">
@@ -17,7 +18,7 @@ export async function Hero() {
             <h1 className="mb-5 text-3xl font-bold md:text-5xl">
               构建自己的知识体系！
             </h1>
-            <p className="mb-5 w-full break-all text-base leading-8 text-zinc-500 md:w-5/6 dark:text-white">
+            <p className="mb-5 w-full break-all text-base leading-8 text-zinc-500 dark:text-white md:w-5/6">
               在这里，您可以记录下自己的点滴思考、知识积累，也可以与他人分享交流。让我们一起构建成属于我们自己的知识之书！
             </p>
             <div className="flex flex-col items-center gap-3 sm:flex-row">

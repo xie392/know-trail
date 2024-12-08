@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "./server/auth";
-// import { db } from "./server/db";
+import { auth } from "~/server/auth";
+import { TOKEN_NAME } from "~/utils/constants";
 
 const whiteList = ["/sign-up", "/sign-in"];
 
@@ -19,23 +19,27 @@ export async function middleware(request: NextRequest) {
   }
 
   // 黑名单设备
-  //   if (session?.token) {
-  //     const blockedToken = await db.blockedToken.findUnique({
-  //       where: { token: session.token },
-  //     });
+  // if (session?.token) {
+  //   const blockedToken = await db.blockedToken.findUnique({
+  //     where: { token: session.token },
+  //   });
 
-  //     if (blockedToken) {
-  //       return NextResponse.redirect(new URL("/api/auth/signout", request.url));
-  //     }
+  //   if (blockedToken) {
+  //     return NextResponse.redirect(new URL("/api/auth/signout", request.url));
   //   }
+  // }
 
   // 如果接近过期时间，尝试刷新
-  if (
-    session?.expires &&
-    new Date(session.expires) < new Date(Date.now() + 5 * 60 * 1000)
-  ) {
-    return NextResponse.redirect(new URL("/api/auth/refresh", request.url));
-  }
+  const token = request.cookies.get(TOKEN_NAME);
+
+  // if (
+  //   session?.expires &&
+  //   new Date(session.expires) < new Date(Date.now() + 5 * 60 * 1000)
+  // ) {
+  //   console.log("Session is about to expire, refreshing...", session);
+
+  //   // return NextResponse.redirect(new URL("/api/auth/refresh", request.url));
+  // }
 
   return NextResponse.next();
 }

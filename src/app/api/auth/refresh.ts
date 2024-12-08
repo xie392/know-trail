@@ -7,10 +7,14 @@ export async function POST(request: Request) {
     const newToken = await rotateRefreshToken(refreshToken as string);
 
     return NextResponse.json({ token: newToken });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to refresh token" },
       { status: 400 },
     );
   }
+}
+
+export async function Get() {
+  return NextResponse.json({ token: "123" });
 }
