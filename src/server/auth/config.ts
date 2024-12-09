@@ -148,18 +148,19 @@ export const authConfig = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 60,
+    maxAge: 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
   },
-  cookies: {
-    sessionToken: {
-      name: TOKEN_NAME,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 30 * 24 * 60 * 60,
-      },
-    },
-  },
+  // cookies: {
+  //   sessionToken: {
+  //     name: TOKEN_NAME,
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: "lax",
+  //       path: "/",
+  //       secure: process.env.NODE_ENV === "production",
+  //       maxAge: 30 * 24 * 60 * 60,
+  //     },
+  //   },
+  // },
 } satisfies NextAuthConfig;

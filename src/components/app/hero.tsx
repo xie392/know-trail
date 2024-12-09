@@ -35,6 +35,7 @@ export async function Hero() {
                   buttonVariants({ variant: "outline" }),
                   "w-full gap-x-1.5 sm:w-24",
                 )}
+                target="_blank"
               >
                 <Github calcMode="size-2" />
                 Github
