@@ -9,6 +9,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { useCallback } from "react";
 
 interface BubbleMenuProps {
   editor: Editor;
@@ -21,16 +37,18 @@ interface MeunItem {
   isActive: (editor: Editor) => boolean;
   tip: string;
   shortcut?: string;
+  options?: Array<{ value: string; label: string }>;
 }
 
 const meuns: MeunItem[] = [
   {
-    type: "select",
+    type: "menu",
     icon: "Heading",
     command: (editor: Editor) =>
       editor.chain().focus().toggleHeading({ level: 1 }).run(),
     isActive: (editor: Editor) => editor.isActive("heading", { level: 1 }),
     tip: "标题1",
+    options: [],
   },
   {
     type: "button",
@@ -74,9 +92,14 @@ const meuns: MeunItem[] = [
 ];
 
 export function BubbleMenu({ editor }: BubbleMenuProps) {
+
+  const shouldShow = useCallback(() => {
+    return true
+  }, []);
+
   return (
-    <TiptapBubbleMenu editor={editor}>
-      <div className="flex gap-x-1 rounded border border-gray-200 bg-background px-2 py-1 shadow">
+    <TiptapBubbleMenu editor={editor} shouldShow={shouldShow}>
+      <div className="relative flex gap-x-1 rounded border border-gray-200 bg-background px-2 py-1 shadow">
         {meuns.map((menu) => {
           if (menu.type === "button") {
             return (
@@ -100,6 +123,22 @@ export function BubbleMenu({ editor }: BubbleMenuProps) {
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
+            );
+          }
+
+          if (menu.type === "menu") {
+            return (
+              <DropdownMenu key={menu.icon}>
+                <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem>Billing</DropdownMenuItem>
+                  <DropdownMenuItem>Team</DropdownMenuItem>
+                  <DropdownMenuItem>Subscription</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             );
           }
 
