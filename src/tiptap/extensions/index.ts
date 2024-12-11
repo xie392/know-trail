@@ -1,4 +1,3 @@
-
 export { StarterKit } from "@tiptap/starter-kit";
 export { Highlight } from "@tiptap/extension-highlight";
 export { CharacterCount } from "@tiptap/extension-character-count";
@@ -21,5 +20,10 @@ export { Collaboration } from "@tiptap/extension-collaboration";
 export { TaskItem } from "@tiptap/extension-task-item";
 export { TaskList } from "@tiptap/extension-task-list";
 
-
-export { Document } from './document'
+export { Document } from "./document";
+export { SlashCommand } from "./slash-command";
+export { TrailingNode } from "./trailing-node";
+export { Figcaption } from "./figcaption";
+export { Figure } from "./figure";
+export { Link } from "./link";
+export { DragHandle } from "./drag-handle";

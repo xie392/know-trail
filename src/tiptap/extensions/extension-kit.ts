@@ -21,6 +21,12 @@ import {
   // Collaboration,
   TaskItem,
   TaskList,
+  SlashCommand,
+  TrailingNode,
+  Figcaption,
+  Figure,
+  Link,
+  DragHandle
 } from ".";
 
 const placeholders = [
@@ -55,5 +61,11 @@ export function ExtensionKit() {
     OrderedList,
     TaskItem,
     TaskList,
+    SlashCommand,
+    TrailingNode,
+    Figcaption,
+    Figure,
+    Link,
+    DragHandle
   ];
 }
