@@ -1,102 +1,442 @@
-import { Node, mergeAttributes } from "@tiptap/core";
-// import { NodeView } from "@tiptap/view";
-import { Plugin } from "@tiptap/pm/state";
+/**
+ * @description 参考来自 tiptap-extension-global-drag-handle
+ * @See https://github.com/NiclasDev63/tiptap-extension-global-drag-handle
+ */
+import { Extension } from "@tiptap/core";
+import {
+  NodeSelection,
+  Plugin,
+  PluginKey,
+  TextSelection,
+} from "@tiptap/pm/state";
+import { Fragment, Slice, type Node } from "@tiptap/pm/model";
 
-export const DragHandle = Node.create({
-  name: "dragHandle",
+// @ts-ignore
+import { __serializeForClipboard, type EditorView } from "@tiptap/pm/view";
 
-  group: "block",
+export interface GlobalDragHandleOptions {
+  /**
+   * 拖拽手柄的宽度
+   */
+  dragHandleWidth: number;
 
-  draggable: true,
+  /**
+   * 滚动阈值
+   */
+  scrollTreshold: number;
 
-  addOptions() {
+  /*
+   * 用于查询拖拽手柄的CSS选择器（例如：'.custom-handle'）。
+   * 如果找到手柄元素，则使用该元素作为拖拽手柄。否则，将创建一个默认的手柄。
+   */
+  dragHandleSelector?: string;
+
+  /**
+   * 需要排除拖拽手柄功能的标签
+   */
+  excludedTags: string[];
+
+  /**
+   * 启用拖拽手柄的自定义节点类型
+   */
+  customNodes: string[];
+}
+
+function absoluteRect(node: Element) {
+  const data = node.getBoundingClientRect();
+  const modal = node.closest('[role="dialog"]');
+
+  if (modal && window.getComputedStyle(modal).transform !== "none") {
+    const modalRect = modal.getBoundingClientRect();
+
     return {
-      HTMLAttributes: {},
+      top: data.top - modalRect.top,
+      left: data.left - modalRect.left,
+      width: data.width,
     };
-  },
+  }
+  return {
+    top: data.top,
+    left: data.left,
+    width: data.width,
+  };
+}
 
-  parseHTML() {
-    return [
+function nodeDOMAtCoords(
+  coords: { x: number; y: number },
+  options: GlobalDragHandleOptions,
+) {
+  const selectors = [
+    "li",
+    "p:not(:first-child)",
+    "pre",
+    "blockquote",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    ...options.customNodes.map((node) => `[data-type=${node}]`),
+  ].join(", ");
+  return document
+    .elementsFromPoint(coords.x, coords.y)
+    .find(
+      (elem: Element) =>
+        elem.parentElement?.matches?.(".ProseMirror") ??
+        elem.matches(selectors),
+    );
+}
+
+function nodePosAtDOM(
+  node: Element,
+  view: EditorView,
+  options: GlobalDragHandleOptions,
+) {
+  const boundingRect = node.getBoundingClientRect();
+
+  return view.posAtCoords({
+    left: boundingRect.left + 50 + options.dragHandleWidth,
+    top: boundingRect.top + 1,
+  })?.inside;
+}
+
+function calcNodePos(pos: number, view: EditorView) {
+  const $pos = view.state.doc.resolve(pos);
+  if ($pos.depth > 1) return $pos.before($pos.depth);
+  return pos;
+}
+
+export function DragHandlePlugin(
+  options: GlobalDragHandleOptions & { pluginKey: string },
+) {
+  let listType = "";
+  function handleDragStart(event: DragEvent, view: EditorView) {
+    view.focus();
+
+    if (!event.dataTransfer) return;
+
+    const node = nodeDOMAtCoords(
       {
-        tag: "div[data-drag-handle]",
+        x: event.clientX + 50 + options.dragHandleWidth,
+        y: event.clientY,
       },
-    ];
-  },
+      options,
+    );
 
-  renderHTML({ HTMLAttributes }) {
-    return [
-      "div",
-      mergeAttributes(
-        { "data-drag-handle": "" },
-        this.options.HTMLAttributes,
-        HTMLAttributes,
-      ),
-      0,
-    ];
-  },
+    if (!(node instanceof Element)) return;
 
-  addNodeView() {
-    return ({ node, view, getPos }) => {
-      const dom = document.createElement("div");
-      dom.setAttribute("data-drag-handle", "");
-      dom.classList.add("drag-handle-wrapper");
+    let draggedNodePos = nodePosAtDOM(node, view, options);
+    if (draggedNodePos == null || draggedNodePos < 0) return;
+    draggedNodePos = calcNodePos(draggedNodePos, view);
 
-      const contentDOM = document.createElement("div");
-      contentDOM.classList.add("drag-handle-content");
+    const { from, to } = view.state.selection;
+    const diff = from - to;
 
-      const handle = document.createElement("div");
-      handle.classList.add("drag-handle");
-      handle.innerHTML = "&#x2630;"; // Unicode for hamburger icon
+    const fromSelectionPos = calcNodePos(from, view);
+    let differentNodeSelected = false;
 
-      handle.addEventListener("mousedown", (event) => {
-        event.preventDefault();
-        view.dispatch(
-          view.state.tr.setMeta("dragging", { pos: getPos(), node }),
-        );
-      });
+    const nodePos = view.state.doc.resolve(fromSelectionPos);
 
-      dom.appendChild(handle);
-      dom.appendChild(contentDOM);
+    // Check if nodePos points to the top level node
+    if (nodePos.node().type.name === "doc") differentNodeSelected = true;
+    else {
+      const nodeSelection = NodeSelection.create(
+        view.state.doc,
+        nodePos.before(),
+      );
+
+      // Check if the node where the drag event started is part of the current selection
+      differentNodeSelected = !(
+        draggedNodePos + 1 >= nodeSelection.$from.pos &&
+        draggedNodePos <= nodeSelection.$to.pos
+      );
+    }
+    let selection = view.state.selection;
+    if (
+      !differentNodeSelected &&
+      diff !== 0 &&
+      !(view.state.selection instanceof NodeSelection)
+    ) {
+      const endSelection = NodeSelection.create(view.state.doc, to - 1);
+      selection = TextSelection.create(
+        view.state.doc,
+        draggedNodePos,
+        endSelection.$to.pos,
+      );
+    } else {
+      selection = NodeSelection.create(view.state.doc, draggedNodePos);
+
+      // if inline node is selected, e.g mention -> go to the parent node to select the whole node
+      // if table row is selected, go to the parent node to select the whole node
+      if (
+        (selection as NodeSelection).node.type.isInline ||
+        (selection as NodeSelection).node.type.name === "tableRow"
+      ) {
+        const $pos = view.state.doc.resolve(selection.from);
+        selection = NodeSelection.create(view.state.doc, $pos.before());
+      }
+    }
+    view.dispatch(view.state.tr.setSelection(selection));
+
+    // If the selected node is a list item, we need to save the type of the wrapping list e.g. OL or UL
+    if (
+      view.state.selection instanceof NodeSelection &&
+      view.state.selection.node.type.name === "listItem"
+    ) {
+      listType = node.parentElement!.tagName;
+    }
+
+    const slice = view.state.selection.content();
+    const { dom, text } = __serializeForClipboard(view, slice);
+
+    event.dataTransfer.clearData();
+    event.dataTransfer.setData("text/html", dom.innerHTML);
+    event.dataTransfer.setData("text/plain", text);
+    event.dataTransfer.effectAllowed = "copyMove";
+
+    event.dataTransfer.setDragImage(node, 0, 0);
+
+    view.dragging = { slice, move: event.ctrlKey };
+  }
+
+  let dragHandleElement: HTMLElement | null = null;
+
+  function hideDragHandle() {
+    if (dragHandleElement) {
+      dragHandleElement.classList.add("hide");
+    }
+  }
+
+  function showDragHandle() {
+    if (dragHandleElement) {
+      dragHandleElement.classList.remove("hide");
+    }
+  }
+
+  function hideHandleOnEditorOut(event: MouseEvent) {
+    if (event.target instanceof Element) {
+      // Check if the relatedTarget class is still inside the editor
+      const relatedTarget = event.relatedTarget as HTMLElement;
+      const isInsideEditor =
+        relatedTarget?.classList.contains("tiptap") ||
+        relatedTarget?.classList.contains("drag-handle");
+
+      if (isInsideEditor) return;
+    }
+    hideDragHandle();
+  }
+
+  return new Plugin({
+    key: new PluginKey(options.pluginKey),
+    view: (view) => {
+      const handleBySelector = options.dragHandleSelector
+        ? document.querySelector<HTMLElement>(options.dragHandleSelector)
+        : null;
+      dragHandleElement = handleBySelector ?? document.createElement("div");
+      dragHandleElement.draggable = true;
+      dragHandleElement.dataset.dragHandle = "";
+      dragHandleElement.classList.add("drag-handle");
+
+      function onDragHandleDragStart(e: DragEvent) {
+        handleDragStart(e, view);
+      }
+
+      dragHandleElement.addEventListener("dragstart", onDragHandleDragStart);
+
+      function onDragHandleDrag(e: DragEvent) {
+        hideDragHandle();
+        const scrollY = window.scrollY;
+        if (e.clientY < options.scrollTreshold) {
+          window.scrollTo({ top: scrollY - 30, behavior: "smooth" });
+        } else if (window.innerHeight - e.clientY < options.scrollTreshold) {
+          window.scrollTo({ top: scrollY + 30, behavior: "smooth" });
+        }
+      }
+
+      dragHandleElement.addEventListener("drag", onDragHandleDrag);
+
+      hideDragHandle();
+
+      if (!handleBySelector) {
+        view?.dom?.parentElement?.appendChild(dragHandleElement);
+      }
+      view?.dom?.parentElement?.addEventListener(
+        "mouseout",
+        hideHandleOnEditorOut,
+      );
 
       return {
-        dom,
-        contentDOM,
-        update: (updatedNode) => {
-          if (updatedNode.type !== node.type) {
-            return false;
+        destroy: () => {
+          if (!handleBySelector) {
+            dragHandleElement?.remove?.();
           }
-          return true;
+          dragHandleElement?.removeEventListener("drag", onDragHandleDrag);
+          dragHandleElement?.removeEventListener(
+            "dragstart",
+            onDragHandleDragStart,
+          );
+          dragHandleElement = null;
+          view?.dom?.parentElement?.removeEventListener(
+            "mouseout",
+            hideHandleOnEditorOut,
+          );
         },
       };
+    },
+    props: {
+      handleDOMEvents: {
+        mousemove: (view, event) => {
+          if (!view.editable) {
+            return;
+          }
+
+          const node = nodeDOMAtCoords(
+            {
+              x: event.clientX + 50 + options.dragHandleWidth,
+              y: event.clientY,
+            },
+            options,
+          );
+
+          const notDragging = node?.closest(".not-draggable");
+          const excludedTagList = options.excludedTags
+            .concat(["ol", "ul"])
+            .join(", ");
+
+          if (
+            !(node instanceof Element) ||
+            node.matches(excludedTagList) ||
+            notDragging
+          ) {
+            hideDragHandle();
+            return;
+          }
+
+          const compStyle = window.getComputedStyle(node);
+          const parsedLineHeight = parseInt(compStyle.lineHeight, 10);
+          const lineHeight = isNaN(parsedLineHeight)
+            ? parseInt(compStyle.fontSize) * 1.2
+            : parsedLineHeight;
+          const paddingTop = parseInt(compStyle.paddingTop, 10);
+
+          const rect = absoluteRect(node);
+
+          rect.top += (lineHeight - 24) / 2;
+          rect.top += paddingTop;
+          // Li markers
+          if (node.matches("ul:not([data-type=taskList]) li, ol li")) {
+            rect.left -= options.dragHandleWidth;
+          }
+          rect.width = options.dragHandleWidth;
+
+          if (!dragHandleElement) return;
+
+          dragHandleElement.style.left = `${rect.left - rect.width}px`;
+          dragHandleElement.style.top = `${rect.top}px`;
+          showDragHandle();
+        },
+        keydown: () => {
+          hideDragHandle();
+        },
+        mousewheel: () => {
+          hideDragHandle();
+        },
+        // dragging class is used for CSS
+        dragstart: (view) => {
+          view.dom.classList.add("dragging");
+        },
+        drop: (view, event) => {
+          view.dom.classList.remove("dragging");
+          hideDragHandle();
+          let droppedNode: Node | null = null;
+          const dropPos = view.posAtCoords({
+            left: event.clientX,
+            top: event.clientY,
+          });
+
+          if (!dropPos) return;
+
+          if (view.state.selection instanceof NodeSelection) {
+            droppedNode = view.state.selection.node;
+          }
+          if (!droppedNode) return;
+
+          const resolvedPos = view.state.doc.resolve(dropPos.pos);
+
+          const isDroppedInsideList =
+            resolvedPos.parent.type.name === "listItem";
+
+          // If the selected node is a list item and is not dropped inside a list, we need to wrap it inside <ol> tag otherwise ol list items will be transformed into ul list item when dropped
+          if (
+            view.state.selection instanceof NodeSelection &&
+            view.state.selection.node.type.name === "listItem" &&
+            !isDroppedInsideList &&
+            listType == "OL"
+          ) {
+            const newList = view.state.schema.nodes.orderedList?.createAndFill(
+              null,
+              droppedNode,
+            );
+            const slice = new Slice(Fragment.from(newList), 0, 0);
+            view.dragging = { slice, move: event.ctrlKey };
+          }
+        },
+        dragend: (view) => {
+          view.dom.classList.remove("dragging");
+        },
+      },
+    },
+  });
+}
+
+/**
+ * Tiptap的全局拖拽手柄扩展
+ * 此扩展为编辑器中的节点添加可拖拽手柄，方便重新排序
+ * 
+ * 功能特点：
+ * - 提供节点拖拽移动的手柄
+ * - 可配置手柄宽度和滚动阈值
+ * - 支持排除特定标签
+ * - 支持自定义节点类型
+ */
+const GlobalDragHandle = Extension.create({
+  name: "globalDragHandle",
+
+  /**
+   * 拖拽手柄的默认配置选项
+   * @returns {Object} 默认选项对象
+   * - dragHandleWidth: 拖拽手柄区域的宽度（像素）
+   * - scrollTreshold: 触发自动滚动的视口边缘距离
+   * - excludedTags: 需要排除拖拽手柄功能的HTML标签数组
+   * - customNodes: 启用拖拽手柄的自定义节点类型数组
+   */
+  addOptions() {
+    return {
+      dragHandleWidth: 20,
+      scrollTreshold: 100,
+      excludedTags: [],
+      customNodes: [],
     };
   },
 
+  /**
+   * 添加拖拽手柄功能的ProseMirror插件
+   * 使用配置的选项初始化拖拽手柄
+   * @returns ProseMirror插件数组
+   */
   addProseMirrorPlugins() {
     return [
-      new Plugin({
-        props: {
-          handleDOMEvents: {
-            mousemove: (view) => {
-              const dragData = view.state.tr.getMeta("dragging");
-              if (!dragData) return false;
-
-              // Implement drag move logic here
-
-              return true;
-            },
-            mouseup: (view) => {
-              if (view.state.tr.getMeta("dragging")) {
-                // Handle drop logic
-                view.dispatch(view.state.tr.setMeta("dragging", null));
-                return true;
-              }
-              return false;
-            },
-          },
-        },
+      DragHandlePlugin({
+        pluginKey: "globalDragHandle",
+        dragHandleWidth: this.options.dragHandleWidth,
+        scrollTreshold: this.options.scrollTreshold,
+        dragHandleSelector: this.options.dragHandleSelector,
+        excludedTags: this.options.excludedTags,
+        customNodes: this.options.customNodes,
       }),
     ];
   },
 });
 
-
+export default GlobalDragHandle;

@@ -25,7 +25,7 @@ const menus = [
   },
 ];
 
-export default function Menu() {
+export const Menu = () => {
   const pathnmae = usePathname();
 
   return (
@@ -37,7 +37,7 @@ export default function Menu() {
               <Link href={menu.link} legacyBehavior passHref>
                 <NavigationMenuLink
                   className={cn(navigationMenuTriggerStyle({}), {
-                    "text-primary font-semibold": pathnmae.startsWith(
+                    "font-semibold text-primary": pathnmae.startsWith(
                       menu.link,
                     ),
                   })}
@@ -51,4 +51,4 @@ export default function Menu() {
       </NavigationMenuList>
     </NavigationMenu>
   );
-}
+};

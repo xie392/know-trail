@@ -1,19 +1,14 @@
 "use client";
 
-import Link from "next/link";
-
-import Menu from "./menu";
-import Tool from "./tool";
+import { Menu } from "./menu";
+import { Tool } from "./tool";
+import { Logo } from "~/components/common/logo";
 
 export default function SiteHeader() {
   return (
-    <header className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 dark:border-border sticky top-0 z-50 border-b px-5 backdrop-blur md:px-6">
+    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 px-5 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:border-border md:px-6">
       <div className="mx-auto flex h-16 w-full max-w-screen-xl items-center">
-        <Link className="flex-shrink-0" href="/">
-          <h1 className="mr-5 bg-gradient-to-r from-blue-500 via-green-500 to-yellow-500 bg-clip-text text-xl font-bold text-transparent">
-            KnowTrail
-          </h1>
-        </Link>
+        <Logo />
         <Menu />
         <Tool />
       </div>

@@ -28,6 +28,7 @@ import {
   Link,
   DragHandle
 } from ".";
+import GlobalDragHandle from 'tiptap-extension-global-drag-handle'
 
 const placeholders = [
   "start typing...",
@@ -66,6 +67,7 @@ export function ExtensionKit() {
     Figcaption,
     Figure,
     Link,
-    DragHandle
+    // DragHandle,
+    GlobalDragHandle
   ];
 }

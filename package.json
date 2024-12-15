@@ -101,6 +101,7 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "tippy.js": "^6.3.7",
+    "tiptap-extension-global-drag-handle": "^0.1.16",
     "ua-parser-js": "^2.0.0",
     "uuid": "^11.0.3",
     "yjs": "^13.6.20",

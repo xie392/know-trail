@@ -15,8 +15,6 @@ import {
   Plus,
 } from "lucide-react";
 
-import { NavMain } from "~/components/post/nav-main";
-import { TeamSwitcher } from "~/components/post/team-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -24,9 +22,12 @@ import {
   SidebarRail,
 } from "~/components/ui/sidebar";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { NavTree } from "~/components/post/nav-tree";
 import { Search } from "~/components/common/search";
 import { Button } from "~/components/ui/button";
+
+import { NavTree } from "./nav-tree";
+import { NavMain } from "./nav-main";
+import { TeamSwitcher } from "./team-switcher";
 
 // This is sample data.
 const data = {
@@ -116,7 +117,7 @@ const data = {
 const SidebarSearch = () => {
   return (
     <div className="flex gap-x-1">
-      <Search className="w-full" />
+      <Search className="w-full bg-background" />
       <Button
         variant="outline"
         size="icon"
